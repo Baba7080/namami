@@ -1,0 +1,7 @@
+/* Basic styling to supplement global classes if needed */
+.influencer-page {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

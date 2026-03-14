@@ -1,0 +1,101 @@
+.page-header {
+    height: 40vh;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: var(--text-inverse);
+    text-align: center;
+}
+
+.machinery-bg {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+}
+
+.eco-paints-bg {
+    background: linear-gradient(135deg, var(--secondary) 0%, #a67c52 100%);
+}
+
+.header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.page-header .container {
+    position: relative;
+    z-index: 2;
+}
+
+.page-title {
+    font-size: 3rem;
+    color: var(--text-inverse);
+    margin-bottom: 12px;
+}
+
+.page-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.max-w-800 {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.block-center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.mb-5 {
+    margin-bottom: 3rem;
+}
+
+.plant-card {
+    background: var(--surface);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--primary);
+    transition: var(--transition);
+}
+
+.plant-card:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+}
+
+.plant-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+}
+
+.plant-card p {
+    color: var(--text-muted);
+}
+
+.turnkey-list {
+    list-style: none;
+    padding: 0;
+}
+
+.turnkey-list li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--surface-alt);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}

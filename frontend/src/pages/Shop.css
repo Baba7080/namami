@@ -1,0 +1,54 @@
+.shop-product-card {
+    background: var(--surface);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.shop-product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+}
+
+.product-image-placeholder {
+    height: 200px;
+    background-color: var(--surface-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-details {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.product-details h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.product-details .desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    flex: 1;
+}
+
+.product-details .price {
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.view-btn {
+    width: 100%;
+    text-align: center;
+}
