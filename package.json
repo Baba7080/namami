@@ -1,0 +1,9 @@
+{
+    "name": "namami-gaiya-deploy",
+    "version": "1.0.0",
+    "scripts": {
+        "build:frontend": "cd frontend && npm install && npm run build",
+        "build:backend": "cd backend && npm install",
+        "start": "cd backend && npm start"
+    }
+}

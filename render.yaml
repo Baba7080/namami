@@ -1,0 +1,20 @@
+services:
+  # Backend configuration
+  - type: web
+    name: namami-gaiya-backend
+    env: node
+    buildCommand: "cd backend && npm install"
+    startCommand: "cd backend && npm start"
+    envVars:
+      - key: PORT
+        value: 5000
+
+  # Frontend configuration
+  - type: web
+    name: namami-gaiya-frontend
+    env: static
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: htts://namami-gaiya-backend.onrender.com # Auto-magic linking isn't perfect, they'll need to manually add the backend URL once created if using Blueprint, but this simplifies the build/start commands.
