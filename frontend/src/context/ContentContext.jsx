@@ -8,7 +8,7 @@ export const ContentProvider = ({ children }) => {
 
     const fetchPageContent = async (pageName) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/content/${pageName}`);
+            const res = await fetch(`\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}/api/admin/content/${pageName}`);
             const data = await res.json();
             if (data.success) {
                 setPageContent(prev => ({ ...prev, [pageName]: data.data }));

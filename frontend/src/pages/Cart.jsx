@@ -21,7 +21,7 @@ const Cart = () => {
         setPromoMsg('Validating...');
 
         try {
-            const res = await fetch('http://localhost:5000/api/coupons/validate', {
+            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/coupons/validate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: promoCode })
@@ -50,7 +50,7 @@ const Cart = () => {
 
         // Simulate API Call
         try {
-            const res = await fetch('http://localhost:5000/api/orders', {
+            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
