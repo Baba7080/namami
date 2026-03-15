@@ -2,9 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const connectDB = require('./config/db');
 const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
+
+// Connect to Database
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,17 +57,14 @@ app.post('/api/orders', (req, res) => {
     });
 });
 
+const Coupon = require('./models/Coupon');
+
 // Handle coupon validation
-app.post('/api/coupons/validate', (req, res) => {
+app.post('/api/coupons/validate', async (req, res) => {
     try {
         const { code } = req.body;
-        const fs = require('fs');
-        const DATA_FILE = path.join(__dirname, 'data.json');
-
-        const data = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : {};
-        const coupons = data.coupons || [];
-
-        const coupon = coupons.find(c => c.code === code && c.isActive !== false);
+        const coupon = await Coupon.findOne({ code, isActive: { $ne: false } });
+        
         if (coupon) {
             res.json({ success: true, valid: true, discountPercentage: coupon.discountPercentage });
         } else {
@@ -75,20 +76,15 @@ app.post('/api/coupons/validate', (req, res) => {
 });
 
 // Handle public influencer/user registration for a coupon
-app.post('/api/influencer/register', (req, res) => {
+app.post('/api/influencer/register', async (req, res) => {
     try {
         const { name, phone, instagramId } = req.body;
         if (!name || !phone) {
             return res.status(400).json({ success: false, message: 'Name and Phone number are required.' });
         }
 
-        const fs = require('fs');
-        const DATA_FILE = path.join(__dirname, 'data.json');
-        const data = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')) : {};
-        const coupons = data.coupons || [];
-
         // Check if phone number already registered
-        const existing = coupons.find(c => c.phone === phone);
+        const existing = await Coupon.findOne({ phone });
         if (existing) {
             return res.status(400).json({ success: false, message: 'A coupon has already been generated for this phone number.', code: existing.code });
         }
@@ -104,24 +100,18 @@ app.post('/api/influencer/register', (req, res) => {
         };
 
         let newCode = generateCode();
-        while (coupons.find(c => c.code === newCode)) {
+        while (await Coupon.findOne({ code: newCode })) {
             newCode = generateCode(); // ensure uniqueness
         }
 
-        const newCoupon = {
-            id: Date.now().toString(),
+        const newCoupon = await Coupon.create({
             code: newCode,
             discountPercentage: 10, // Default discount for public signups
             isActive: true,
-            createdAt: new Date().toISOString(),
             name,
             phone,
             instagramId: instagramId || ''
-        };
-
-        coupons.push(newCoupon);
-        data.coupons = coupons;
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+        });
 
         res.json({ success: true, code: newCode, discountPercentage: 10 });
     } catch (err) {

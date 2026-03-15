@@ -3,34 +3,24 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
-const DATA_FILE = path.join(__dirname, '../data.json');
-
-// Helper to read data
-const readData = () => {
-    try {
-        const data = fs.readFileSync(DATA_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        return {};
-    }
-};
-
-// Helper to write data
-const writeData = (data) => {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-};
+const Content = require('../models/Content');
+const Coupon = require('../models/Coupon');
+const UserAdmin = require('../models/UserAdmin');
 
 // --- AUTHENTICATION ---
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    // Hardcoded for simplicity as requested
-    if (username === 'admin' && password === 'namami123') {
-        const token = jwt.sign({ role: 'admin' }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1d' });
-        res.json({ success: true, token });
-    } else {
-        res.status(401).json({ success: false, message: 'Invalid credentials' });
+router.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const admin = await UserAdmin.findOne({ username });
+        
+        if (admin && await admin.comparePassword(password)) {
+            const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1d' });
+            res.json({ success: true, token });
+        } else {
+            res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Login error' });
     }
 });
 
@@ -50,11 +40,9 @@ const verifyAdmin = (req, res, next) => {
 // --- CONTENT MANAGEMENT ---
 
 // Get content for a specific page
-router.get('/content/:page', (req, res) => {
+router.get('/content/:page', async (req, res) => {
     try {
-        const allData = readData();
-        const pageContent = allData[req.params.page] || null;
-
+        const pageContent = await Content.findOne({ page: req.params.page });
         if (!pageContent) return res.status(404).json({ success: false, message: 'Page content not found' });
         res.json({ success: true, data: pageContent });
     } catch (error) {
@@ -63,25 +51,18 @@ router.get('/content/:page', (req, res) => {
 });
 
 // Update or create content for a page (Protected)
-router.put('/content/:page', verifyAdmin, (req, res) => {
+router.put('/content/:page', verifyAdmin, async (req, res) => {
     try {
         const { title, sections, images } = req.body;
         const page = req.params.page;
 
-        const allData = readData();
+        const updatedContent = await Content.findOneAndUpdate(
+            { page },
+            { title, sections, images },
+            { upsert: true, new: true }
+        );
 
-        // Update the specific page
-        allData[page] = {
-            page: page,
-            title: title || (allData[page] ? allData[page].title : ''),
-            sections: sections || {},
-            images: images || {},
-            updatedAt: new Date().toISOString()
-        };
-
-        writeData(allData);
-
-        res.json({ success: true, data: allData[page] });
+        res.json({ success: true, data: updatedContent });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -114,10 +95,9 @@ router.post('/upload', verifyAdmin, upload.single('image'), (req, res) => {
 // --- COUPON MANAGEMENT ---
 
 // Get all coupons
-router.get('/coupons', verifyAdmin, (req, res) => {
+router.get('/coupons', verifyAdmin, async (req, res) => {
     try {
-        const allData = readData();
-        const coupons = allData.coupons || [];
+        const coupons = await Coupon.find().sort({ createdAt: -1 });
         res.json({ success: true, data: coupons });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -125,28 +105,21 @@ router.get('/coupons', verifyAdmin, (req, res) => {
 });
 
 // Create new coupon
-router.post('/coupons', verifyAdmin, (req, res) => {
+router.post('/coupons', verifyAdmin, async (req, res) => {
     try {
         const { code, discountPercentage, isActive } = req.body;
-        const allData = readData();
-        const coupons = allData.coupons || [];
-
+        
         // check if exists
-        if (coupons.find(c => c.code === code)) {
+        const existing = await Coupon.findOne({ code });
+        if (existing) {
             return res.status(400).json({ success: false, message: 'Coupon code already exists' });
         }
 
-        const newCoupon = {
-            id: Date.now().toString(),
+        const newCoupon = await Coupon.create({
             code,
             discountPercentage: Number(discountPercentage),
-            isActive: isActive !== undefined ? isActive : true,
-            createdAt: new Date().toISOString()
-        };
-
-        coupons.push(newCoupon);
-        allData.coupons = coupons;
-        writeData(allData);
+            isActive: isActive !== undefined ? isActive : true
+        });
 
         res.json({ success: true, data: newCoupon });
     } catch (error) {
@@ -155,47 +128,34 @@ router.post('/coupons', verifyAdmin, (req, res) => {
 });
 
 // Update coupon
-router.put('/coupons/:id', verifyAdmin, (req, res) => {
+router.put('/coupons/:id', verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { code, discountPercentage, isActive } = req.body;
-        const allData = readData();
-        const coupons = allData.coupons || [];
 
-        const index = coupons.findIndex(c => c.id === id);
-        if (index === -1) return res.status(404).json({ success: false, message: 'Coupon not found' });
+        const updatedCoupon = await Coupon.findByIdAndUpdate(id, {
+            code,
+            discountPercentage: discountPercentage !== undefined ? Number(discountPercentage) : undefined,
+            isActive
+        }, { new: true });
 
-        coupons[index] = {
-            ...coupons[index],
-            code: code !== undefined ? code : coupons[index].code,
-            discountPercentage: discountPercentage !== undefined ? Number(discountPercentage) : coupons[index].discountPercentage,
-            isActive: isActive !== undefined ? isActive : coupons[index].isActive,
-            updatedAt: new Date().toISOString()
-        };
+        if (!updatedCoupon) return res.status(404).json({ success: false, message: 'Coupon not found' });
 
-        allData.coupons = coupons;
-        writeData(allData);
-
-        res.json({ success: true, data: coupons[index] });
+        res.json({ success: true, data: updatedCoupon });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
 // Delete coupon
-router.delete('/coupons/:id', verifyAdmin, (req, res) => {
+router.delete('/coupons/:id', verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const allData = readData();
-        const coupons = allData.coupons || [];
-
-        const filtered = coupons.filter(c => c.id !== id);
-        if (filtered.length === coupons.length) {
+        const deletedCoupon = await Coupon.findByIdAndDelete(id);
+        
+        if (!deletedCoupon) {
             return res.status(404).json({ success: false, message: 'Coupon not found' });
         }
-
-        allData.coupons = filtered;
-        writeData(allData);
 
         res.json({ success: true, message: 'Coupon deleted successfully' });
     } catch (error) {
