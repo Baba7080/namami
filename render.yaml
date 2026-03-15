@@ -15,6 +15,17 @@ services:
     env: static
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /admin/*
+        destination: /index.html
+      - type: rewrite
+        source: /influencer-program
+        destination: /index.html
+      # General fallback for any other subroutes
+      - type: rewrite
+        source: /((?!api|uploads|static).*)
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://namami-gaiya-backend.onrender.com # Auto-magic linking isn't perfect, they'll need to manually add the backend URL once created if using Blueprint, but this simplifies the build/start commands.
+        value: https://namami.onrender.com # Confirmed by user as correct backend URL
