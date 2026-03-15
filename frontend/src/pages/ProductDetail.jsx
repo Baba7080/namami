@@ -22,8 +22,8 @@ const ProductDetail = () => {
         // Simulated fetch for product details
         const fetchProduct = async () => {
             try {
-                const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products`);
-                const data = await res.json();
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/${id}`);
+                const data = await response.json();
                 const found = data.find(p => p.id === parseInt(id)) || null;
                 setProduct(found);
             } catch (err) {

@@ -11,7 +11,7 @@ const CouponManagement = () => {
     const fetchCoupons = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -36,7 +36,7 @@ const CouponManagement = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const CouponManagement = () => {
     const handleToggle = async (coupon) => {
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}/api/admin/coupons/${coupon.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons/${coupon.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const CouponManagement = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}/api/admin/coupons/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/coupons/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

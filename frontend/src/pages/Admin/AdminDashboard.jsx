@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
     const loadContent = async (pageRoute) => {
         try {
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}/api/admin/content/${pageRoute}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/content/${pageRoute}`);
             const data = await res.json();
             if (data.success && data.data) {
                 setContentData({
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/upload`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
             if (data.success) {
                 setContentData(prev => ({
                     ...prev,
-                    images: { ...prev.images, [imageKey]: `\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}${data.imageUrl}` }
+                    images: { ...prev.images, [imageKey]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${data.imageUrl}` }
                 }));
             }
         } catch (err) {
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`\${import.meta.env.VITE_API_URL || `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}`}/api/admin/content/${activeTab}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/content/${activeTab}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
