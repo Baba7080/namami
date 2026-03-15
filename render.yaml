@@ -17,4 +17,4 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: htts://namami-gaiya-backend.onrender.com # Auto-magic linking isn't perfect, they'll need to manually add the backend URL once created if using Blueprint, but this simplifies the build/start commands.
+        value: https://namami-gaiya-backend.onrender.com # Auto-magic linking isn't perfect, they'll need to manually add the backend URL once created if using Blueprint, but this simplifies the build/start commands.
