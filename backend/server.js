@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const connectDB = require('./config/db');
 const adminRoutes = require('./routes/adminRoutes');
+const callLogRoutes = require('./routes/callLogRoutes');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Admin & CMS Routes
 app.use('/api/admin', adminRoutes);
+app.use('/api/logs', callLogRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
